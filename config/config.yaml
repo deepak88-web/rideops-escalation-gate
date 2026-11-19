@@ -1,0 +1,77 @@
+# RideOps Support Escalation Gate - Project Configuration
+
+paths:
+  raw_tickets: "data/raw/rideops_support_tickets.csv"
+  data_dictionary: "data/raw/rideops_data_dictionary.csv"
+  processed_tickets: "data/processed/tickets_clean.csv"
+  models_dir: "models"
+  reports_dir: "reports"
+  figures_dir: "reports/figures"
+  tables_dir: "reports/tables"
+
+data_quality:
+  expected_nulls:
+    first_response_at: 5
+    first_closed_at: 42
+    final_closed_at: 48
+    eng_outcome: 958
+    eng_ticket_id: 958
+    csat_score: 796
+  snapshot_as_of: "2026-09-30 23:59:59"
+  partial_weeks:
+    - "2026-06-29"
+    - "2026-09-28"
+
+business_rules:
+  repeat_contact_window_days: 14
+  repeat_contact_max_days_exclusive: 15.0
+  real_fix_outcome: "Fixed"
+  returned_to_l1_outcomes:
+    - "Config issue - returned to L1"
+    - "Insufficient info - returned to L1"
+  sla_targets_hours:
+    P1: 1.0
+    P2: 4.0
+    P3: 8.0
+    P4: 24.0
+  backlog_age_thresholds_hours:
+    day_1: 24
+    day_2: 48
+    day_7: 168
+
+modeling:
+  operating_threshold: 0.55
+  cv_folds: 5
+  random_state: 42
+  temporal_split_month: 9  # Train on Jul-Aug (months 7, 8), Test on Sep (month 9)
+  pre_escalation_features:
+    categorical:
+      - "category"
+      - "priority"
+      - "channel"
+      - "client_tier"
+      - "assigned_agent"
+      - "weekday"
+    numerical:
+      - "hrs_to_first_response"
+      - "hour_of_day"
+      - "is_repeat_contact"
+      - "client_prior_tickets"
+    text: "description"
+  forbidden_leakage_columns:
+    - "eng_outcome"
+    - "eng_handoffs"
+    - "eng_ticket_id"
+    - "first_closed_at"
+    - "final_closed_at"
+    - "hrs_to_first_close"
+    - "hrs_to_final_close"
+    - "resolution_hrs"
+    - "reopen_count"
+    - "is_reopened"
+    - "csat_score"
+    - "status"
+    - "is_open"
+    - "open_age_hrs"
+    - "is_avoidable_esc"
+    - "is_returned_to_l1"
