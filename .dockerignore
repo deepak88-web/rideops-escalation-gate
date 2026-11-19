@@ -1,0 +1,13 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.git/
+.github/
+.idea/
+.vscode/
+data/overrides.db
+data/interim/
+reports/figures/
+reports/tables/
+*.log
