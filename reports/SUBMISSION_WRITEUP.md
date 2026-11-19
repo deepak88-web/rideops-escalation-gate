@@ -31,10 +31,10 @@ Analysis of all **1,444 Q3 tickets (July 2 – September 30, 2026)** reveals tha
 * **The Data Evidence**:
   * **Sandeep is right on root cause**: **56.58% (~57%)** of all engineering escalations are **avoidable** (closed as configuration errors, missing information, user confusion, or duplicates). Furthermore, **26.34%** (128 tickets) are bounced right back to L1 without any code fix.
   * **Meera is right on customer pain**: Escalated tickets suffer an exponential latency penalty. Each engineering handoff drastically inflates customer wait times ($p < 10^{-15}$):
-    * **0 handoffs (L1 only)**: Median **12.4h** | P90: **29.5h** | CSAT: **3.95**
-    * **1 handoff**: Median **33.8h** | P90: **71.4h** | CSAT: **2.97**
-    * **2 handoffs**: Median **54.9h** | P90: **94.6h** | CSAT: **2.43**
-    * **3 handoffs**: Median **66.1h** | P90: **104.9h** | CSAT: **1.86**
+    * **0 handoffs (L1 only)**: Median **12.57h** | P90: **43.3h** | Mean CSAT: **4.01** ($n=944$)
+    * **1 handoff**: Median **58.65h** | P90: **111.2h** | Mean CSAT: **3.56** ($n=245$)
+    * **2 handoffs**: Median **110.37h** | P90: **188.3h** | Mean CSAT: **2.80** ($n=153$)
+    * **3 handoffs**: Median **169.91h** | P90: **290.1h** | Mean CSAT: **2.10** ($n=54$)
   * Escalated tickets account for only 33.7% of volume, but eat **70.54% of all customer resolution hours**.
 
 #### 2. Ritika (Head of Ops): *"I have no budget for new hires right now."*
@@ -72,22 +72,22 @@ Success means reducing customer-visible open backlog by eliminating avoidable es
 
 ## Part 3: Build a v0 — User Selection, Tool Design & Why It Works
 
-### Targeted User: **The L1 Support Agent & Meera (Support Lead)**
-* **Why this user?** The escalation decision is made exclusively by L1 support. Once a ticket enters the engineering queue, the context-switching penalty and 40+ hour delay have already occurred. Equipping L1 agents with real-time decision support at the point of triage intercepts avoidable handoffs before they enter Tier 3 engineering.
+### Targeted Primary User: **The L1 Support Agent at Triage**
+* **Why this user?** In alignment with the case study brief's instruction to target a single primary user, we focused exclusively on the frontline **Level 1 (L1) Support Agent** at the triage checkpoint. The decision to escalate belongs entirely to L1 agents. Once a ticket crosses into the engineering backlog, the 40+ hour context-switching delay has already been incurred. While secondary dashboard tabs provide supervisory visibility for leadership (Meera/Ritika), the core application is an operational decision copilot built for L1 agents.
 
 ### What We Built: The RideOps Escalation Gate (`app.py`)
-A working internal web application (built on Streamlit) powered by our production-trained Machine Learning model (`avoidable_escalation_gate.joblib`):
+A working internal web application (built on Streamlit) powered by our production-trained Machine Learning model (`live_triage_gate.joblib`):
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                    RIDEOPS LIVE ESCALATION GATE (v0)                        │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ 1. TICKET TRIAGE CHECKER (Agent Interface)                                  │
+│ 1. TICKET TRIAGE CHECKER (L1 Agent Interface)                               │
 │    • Inputs: Category, Priority, Client Tier, Channel, Agent, Description   │
-│    • Model Scoring: Evaluates 10 pre-escalation features in real-time       │
-│    • Operating Threshold: Cutoff at 0.55 probability                        │
+│    • Model Scoring: Evaluates pre-escalation features in real-time          │
+│    • Operating Threshold: Cutoff at 0.82 probability                        │
 │                                                                             │
-│    [SCENARIO A: P(Avoidable) = 0.74 >= 0.55]                                │
+│    [SCENARIO A: P(Avoidable) = 0.91 >= 0.82]                                │
 │    🚨 GATE ACTIVATED: HIGH RISK OF AVOIDABLE ESCALATION                     │
 │    Dynamic Actionable Checklist:                                            │
 │    [!] Known Issue Detected: "Report export timeout" microservice bug.      │
@@ -95,11 +95,11 @@ A working internal web application (built on Streamlit) powered by our productio
 │    [ ] Verify client has downloaded CSV via Chrome Incognito.               │
 │    [ ] Check if client permissions were modified this week.                 │
 │                                                                             │
-│    [SCENARIO B: P(Avoidable) = 0.22 < 0.55]                                 │
+│    [SCENARIO B: P(Avoidable) = 0.62 < 0.82]                                 │
 │    ✅ GATE PASSED: LEGITIMATE ENGINEERING DEFECT                           │
 │    Route immediately to Tier 3 Engineering Queue.                           │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ 2. OPS INTELLIGENCE COCKPIT (Meera & Ritika Interface)                      │
+│ 2. OPS INTELLIGENCE COCKPIT (Supervisory & Audit Views)                     │
 │    • Live Open Backlog: Real-time filtering of the 48 open tickets.         │
 │    • The "Karan Check": Visual speed vs. reopen rate trade-off tracker.     │
 │    • The "Rahul Tracker": Actual vs. Expected escalation ratio monitoring.  │
@@ -107,16 +107,20 @@ A working internal web application (built on Streamlit) powered by our productio
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Machine Learning Validation (Zero Data Leakage & Two-Model Strategy)
+### Machine Learning Validation (Zero Data Leakage & Grounded Performance)
 * **Leakage Guard**: Enforces strict isolation—features post-dating escalation (`eng_outcome`, `eng_handoffs`, `resolution_hrs`, `csat_score`) are strictly forbidden.
 * **Model 1 (Historical Escalation Audit, N=182 Sep Holdout)**:
-  * **ROC-AUC**: **0.5460** | **PR-AUC**: **0.6376** (vs. 0.5665 baseline)
+  * **ROC-AUC**: **0.5460** | **PR-AUC**: **0.6376** (vs. 0.4285 / 0.5665 category baseline)
   * **Recall**: **54.05%** | **Precision**: **64.52%** | **F1**: **0.588**
   * *Purpose:* Enables Meera to conduct retrospective audits of avoidable escalation patterns and agent coaching needs.
 * **Model 2 (Live Pre-Escalation Gate, N=503 Sep Holdout)**:
-  * **ROC-AUC**: **0.6461** | **PR-AUC**: **0.9278** (vs. 0.9164 baseline)
-  * **Precision**: **90.09%** | **Recall**: **72.77%** | **F1**: **0.805**
-  * *Purpose:* Operational live triage at incoming ticket evaluation. At operating threshold 0.82, over 90% of flagged tickets are confirmed resolvable at L1, preventing premature engineering context switching.
+  * **ROC-AUC**: **0.6461** | **PR-AUC**: **0.9278** (vs. 0.6351 / 0.9164 category baseline — modest +0.011 ROC-AUC lift)
+  * **Precision**: **90.08%** | **Recall**: **72.77%** | **F1**: **0.805**
+  * *Purpose:* Operational live triage at incoming ticket evaluation. At operating threshold 0.82, 90.1% of flagged tickets are confirmed resolvable at L1, preventing premature engineering context switching.
+* **Analytical Takeaway on Base Rate & Text NLP**:
+  * The 0.928 PR-AUC is predominantly driven by the high ~87% positive base rate in the live triage evaluation set (where naive category frequency already achieves 0.916 PR-AUC).
+  * TF-IDF ticket description text models achieved near-random discrimination (ROC-AUC ~0.44–0.47), demonstrating that ticket text lacks predictive signal on defect legitimacy. Category and structured ticket metadata carry virtually all the signal.
+  * The true leverage of the gate is process enforcement: guiding L1 agents through diagnostic checklists, intercepting duplicate known issues (e.g. `ISS-101`), and maintaining manager override auditability.
 * **Human-in-the-Loop Governance**: All live gate decisions and manager overrides are permanently logged to SQLite (`data/overrides.db`) for operational tracking.
 
 ---
@@ -141,6 +145,6 @@ A working internal web application (built on Streamlit) powered by our productio
 3. **Complex Microservices Architecture or Heavy External Infra**:
    * *Why:* The tool must be maintainable, self-contained, and lightweight. We chose SQLite for persistence and Streamlit for interface rather than spinning up complex microservices, Redis clusters, or external databases.
 4. **Unnecessary Deep Learning or Large Language Model (LLM) Integration**:
-   * *Why:* Tabular Logistic Regression and TF-IDF n-grams achieve a robust 0.928 PR-AUC on live triage with zero latency, complete explainability, and determinism. Deep learning would introduce unnecessary operational cost, opacity, and maintenance overhead without measurable accuracy gains.
+   * *Why:* Tabular Logistic Regression provides a lightweight, calibrated baseline (0.646 ROC-AUC / 0.928 PR-AUC) with zero latency, zero inference cost, and complete explainability. Text TF-IDF models provided essentially zero discriminative signal (ROC-AUC ~0.44–0.47) over structured ticket metadata. Complex deep learning or LLMs would introduce substantial operational cost, latency, and maintenance overhead without measurable accuracy gains over structured checklist enforcement.
 5. **Claiming Backlog Reduction Without Actual Operational Evidence**:
    * *Why:* Backlog reduction is an operational outcome, not an ML metric. We measure true success through week-on-week closed tickets, median and P90 resolution times, and customer satisfaction (CSAT), rather than assuming model deployment automatically clears tickets.

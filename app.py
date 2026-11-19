@@ -149,9 +149,9 @@ st.sidebar.divider()
 st.sidebar.markdown("**System Architecture & Models**")
 st.sidebar.markdown(f"• **Live Triage Gate:** `{'Ready' if live_model is not None else 'Unavailable'}`")
 st.sidebar.markdown(f"• **Live Cutoff Threshold:** `{LIVE_OPERATING_THRESHOLD}`")
-st.sidebar.markdown("• **Live Gate Sep Holdout:** `ROC-AUC: 0.646 | PR-AUC: 0.928`")
+st.sidebar.markdown("• **Live Gate Sep Holdout:** `ROC-AUC: 0.646 | PR-AUC: 0.928` *(vs Category Baseline: 0.635 / 0.916; ~87% base rate)*")
 st.sidebar.markdown(f"• **Historical Quality Model:** `{'Ready' if hist_model is not None else 'Unavailable'}`")
-st.sidebar.markdown("• **Historical Sep Holdout:** `ROC-AUC: 0.546 | PR-AUC: 0.638`")
+st.sidebar.markdown("• **Historical Sep Holdout:** `ROC-AUC: 0.546 | PR-AUC: 0.638` *(vs Category Baseline: 0.429 / 0.567)*")
 st.sidebar.markdown(f"• **Active Tickets Loaded:** `{len(df):,}`")
 
 
@@ -171,7 +171,7 @@ if view_mode == "🎯 L1 Agent: Live Triage Gate":
         [
             "Custom Input",
             "Scenario A: 'Report export failing' (Active Known Issue ENG-402 - High Avoidable Risk)",
-            "Scenario B: 'OTP / boarding issue' (Core Flow Defect - Legitimate Defect Risk)",
+            "Scenario B: 'Roster / booking not syncing' (Backend Sync Failure - Legitimate Defect Profile)",
             "Scenario C: 'Billing / invoice discrepancy' (Rate Card Config - High Avoidable Risk)",
             "Scenario D: 'Live tracking / GPS incorrect' (Driver Telemetry - L1 Diagnostic Required)"
         ]
@@ -190,18 +190,18 @@ if view_mode == "🎯 L1 Agent: Live Triage Gate":
         d_rep = 1
         d_prior = 6
         d_text = "Transport admin reports monthly MIS CSV export spinning indefinitely and failing with gateway 504 timeout."
-    elif preset == "Scenario B: 'OTP / boarding issue' (Core Flow Defect - Legitimate Defect Risk)":
-        d_cat = "OTP / boarding issue"
+    elif preset == "Scenario B: 'Roster / booking not syncing' (Backend Sync Failure - Legitimate Defect Profile)":
+        d_cat = "Roster / booking not syncing"
         d_prio = "P1"
-        d_chan = "WhatsApp"
+        d_chan = "Client portal"
         d_tier = "Enterprise"
         d_agent = "Vikram S"
         d_day = "Monday"
-        d_frt = 0.5
+        d_frt = 0.4
         d_hour = 9
         d_rep = 0
         d_prior = 12
-        d_text = "Fatal null pointer crash during OTP verification screen on Android driver build v2.4.1 affecting airport shifts."
+        d_text = "Automated driver roster ingestion service timing out and corrupting airport shift manifests."
     elif preset == "Scenario C: 'Billing / invoice discrepancy' (Rate Card Config - High Avoidable Risk)":
         d_cat = "Billing / invoice discrepancy"
         d_prio = "P3"
@@ -219,13 +219,13 @@ if view_mode == "🎯 L1 Agent: Live Triage Gate":
         d_prio = "P2"
         d_chan = "Phone"
         d_tier = "Enterprise"
-        d_agent = "Sneha M"
-        d_day = "Thursday"
-        d_frt = 1.2
-        d_hour = 16
-        d_rep = 0
-        d_prior = 5
-        d_text = "Fleet manager observes cab marker lagging by 8 minutes on live dispatch map for shift 3."
+        d_agent = "Karan B"
+        d_day = "Tuesday"
+        d_frt = 1.5
+        d_hour = 14
+        d_rep = 1
+        d_prior = 8
+        d_text = "Fleet manager reports cab telemetry marker lagging by 8 minutes on live dispatch map. Needs driver device GPS and app permissions check."
     else:
         d_cat = "Billing / invoice discrepancy"
         d_prio = "P2"
@@ -601,7 +601,11 @@ elif view_mode == "📊 Operations & Backlog Cockpit":
     st.divider()
 
     # 5. Persistent Override & Decision Monitoring (SQLite)
-    st.subheader("🛡️ Persistent Override & Decision Monitoring (Live SQLite DB)")
+    st.subheader("🛡️ Persistent Override & Decision Monitoring (SQLite Audit Ledger)")
+    st.caption(
+        "ℹ️ Pre-seeded with 12 late-September calibration records (grounded in tickets_clean.csv) to demonstrate audit trail logging, "
+        "manager override analysis, and schema persistence. New triage decisions from the Live Gate will append here in real-time."
+    )
     override_stats = compute_override_metrics()
 
     o1, o2, o3, o4 = st.columns(4)

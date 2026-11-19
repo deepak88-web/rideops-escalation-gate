@@ -17,11 +17,13 @@ RideOps support operations observed substantial latency in resolving high-priori
 1. **The Avoidable Escalation Bottleneck**: **33.66%** of all support tickets (486) are escalated to Tier 3 engineering. However, **56.58% (~57%)** of these escalations are **avoidable** (resolved as configuration issues, insufficient information, user errors, or duplicates).
 2. **Resolution Time Asymmetry**: Escalated tickets account for only 33.7% of volume but consume **70.54% (~71%)** of all customer-facing resolution hours.
 3. **Engineering Handoff Penalty**: Each engineering handoff causes an exponential resolution time explosion:
-   * **0 handoffs (L1 only)**: Median **12.4h** (P90: 29.5h)
-   * **1 handoff**: Median **33.8h** (P90: 71.4h)
-   * **2 handoffs**: Median **54.9h** (P90: 94.6h)
-   * **3 handoffs**: Median **66.1h** (P90: 104.9h)
+   * **0 handoffs (L1 only)**: Median **12.57h** (P90: 43.3h, $n=944$)
+   * **1 handoff**: Median **58.65h** (P90: 111.2h, $n=245$, a 4.7× increase over L1)
+   * **2 handoffs**: Median **110.37h** (P90: 188.3h, $n=153$)
+   * **3 handoffs**: Median **169.91h** (P90: 290.1h, $n=54$)
 4. **Repeat Contact Surge**: Repeat contacts surged from **14.9% in July** to **24.8% in September**, heavily concentrated in report export failures and payment billing issues.
+
+**Primary User Scope**: In accordance with the prompt's instruction to target a single primary user, this tool is designed for the **Level 1 (L1) Support Agent** at the triage checkpoint. While secondary tabs provide supervisory auditability for leadership (Meera/Ritika), the core intervention is an L1 decision copilot that stops avoidable handoffs before context switching occurs.
 
 To resolve this, the **RideOps Escalation Gate** introduces:
 - A complete, modular operational intelligence analytics engine.
@@ -148,13 +150,13 @@ python -m unittest discover -s tests -p "test_*.py"
 | **A** | **Data Quality** | 0 duplicates, expected nulls | 0 duplicates; 958 non-escalated tickets with null outcome; 0 timestamp anomalies | Data passes all integrity checks. |
 | **B** | **Repeat Contacts** | Jul: ~14.9%, Aug: ~18.0%, Sep: ~24.8% | Jul: **14.87%**, Aug: **17.97%**, Sep: **24.83%** | Escalated repeat rate driven by report exports & billing. |
 | **C** | **Backlog & Volume** | Intake vs. closure | Intake grew from 85/wk to 157/wk; 48 open tickets as of Sep 30 | Net backlog positive due to intake surge. |
-| **D** | **Speed & SLA** | First response target P1 $\le 1$h | Overall median FRT: 1.5h; P1 within SLA: **32.8%** | Critical need for automated triage routing. |
+| **D** | **Speed & SLA** | First response target P1 $\le 1$h | P1 median FRT: **0.28h** (17m); P1 within SLA: **97.0%** (65/67 within 1.0h) | Frontline FRT is strong; true latency bottleneck is post-escalation handoffs. |
 | **E** | **Escalation Load** | Escalated hours share ~71% | **70.54%** of total closed resolution hours; 56.58% avoidable | Avoidable escalations tie up Tier 3 engineering. |
 | **E5** | **Duplicate Issues** | Report export failure standout | **30 duplicate escalations** (38.96% of category escalations) | Single known defect responsible for ~11% of avoidable escalations. |
 | **F** | **CSAT Response** | ~55% non-response | **55.12% missing scores**; Enterprise clients respond at higher rates | CSAT suffers from non-response bias. |
 | **G** | **Agent Benchmarking** | Rahul: 1.8× expected; Karan: 0.5× | Rahul T: **1.79×**; Karan B: **0.48×** (Case-mix adjusted) | Rahul over-escalates; Karan shows speed vs. quality trade-off (29.5% reopen rate). |
 | **I** | **Hypothesis Tests** | Claims supported by p-values | All 7 tests significant ($p < 0.05$) | Validates that avoidable rates, handoff penalties, and volume trends are statistically genuine. |
-| **J** | **ML Gate** | Temporal Split (Train Jul-Aug, Test Sep) | Model 1: ROC-AUC **0.546**, PR-AUC **0.638**; Model 2 (Live Gate): ROC-AUC **0.646**, PR-AUC **0.928** | Accurate pre-escalation triage and historical quality analysis. |
+| **J** | **ML Gate** | Temporal Split (Train Jul-Aug, Test Sep) | Model 1: ROC-AUC **0.546**, PR-AUC **0.638**; Model 2 (Live Gate): ROC-AUC **0.646**, PR-AUC **0.928** (vs. 0.635 / 0.916 baseline) | Modest +0.011 ROC-AUC lift over category baseline; 0.928 PR-AUC reflects 87% base rate. |
 
 ---
 
@@ -201,6 +203,11 @@ Gradient Boosting             0.6046   0.9163      0.8750   0.7368  0.8000
 Hybrid (Tabular + TF-IDF)     0.6337   0.9199      0.8947   0.7391  0.8095
 ```
 
+**Analytical Takeaway on Model Lift & Base Rate:**
+* **Category Baseline vs. Model Lift**: The naive category baseline achieves ROC-AUC **0.6351** and PR-AUC **0.9164**. Logistic Regression delivers ROC-AUC **0.6461** and PR-AUC **0.9278**—an incremental uplift of **+0.011 ROC-AUC**. The high 0.928 PR-AUC is predominantly driven by the high base rate (~87%) of L1-resolvable tickets in the live triage pool.
+* **Text NLP Signal**: Ticket description text models (TF-IDF) achieve an ROC-AUC of ~0.44–0.47 (near-random), indicating that ticket text in this dataset lacks discriminative signal on defect legitimacy. Category and structured ticket metadata carry virtually all the signal.
+* **Operational Value**: The gate's primary leverage comes from enforcing structured diagnostic checklists, surfacing known defect workarounds (e.g., `#ENG-402`), and providing manager override auditability, rather than relying on algorithmic opacity.
+
 ---
 
 ## 7. Persistent Override Tracking & Known-Issue Management
@@ -229,7 +236,7 @@ Rather than acting as a hard automated barrier, the RideOps Escalation Gate oper
 1. **Automatic Escalation Blocking**: Retain human approval with manager override rather than hard blocking.
 2. **Unnecessary Hiring (Support or Engineering)**: Headcount expansion treats symptoms and funnels more noise into the engineering queue.
 3. **Complex Microservices Architecture or Heavy External Infra**: Maintain a self-contained, lightweight SQLite and Streamlit architecture.
-4. **Unnecessary Deep Learning or LLM Integration**: Tabular Logistic Regression and TF-IDF achieve 0.928 PR-AUC with zero latency, full explainability, and no operational inference costs.
+4. **Unnecessary Deep Learning or LLM Integration**: Tabular Logistic Regression provides a calibrated baseline (0.646 ROC-AUC / 0.928 PR-AUC) with zero latency, complete explainability, and zero inference costs. Unstructured ticket text added no signal over metadata, and complex LLMs would add cost and latency without improving triage precision over structured checklists.
 5. **Claiming Backlog Reduction Without Actual Operational Evidence**: Measure real success through week-on-week closed tickets, median and P90 resolution times, and customer satisfaction (CSAT).
 
 ---

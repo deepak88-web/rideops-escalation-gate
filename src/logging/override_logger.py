@@ -173,55 +173,68 @@ def compute_override_metrics(db_path: Optional[Path] = None) -> Dict[str, Any]:
 
 def seed_sample_overrides_if_empty(db_path: Optional[Path] = None) -> None:
     """
-    Seed initial historical decision records from late September if table is empty.
-    Allows operations leads to inspect real-world override distribution on first launch.
+    Seed initial historical calibration records from late September matching
+    ground-truth ticket records in tickets_clean.csv if table is empty or contains legacy data.
+    Pre-seeds demo audit trail to demonstrate override tracking and audit logging on first launch.
     """
     init_override_db(db_path)
     conn = _get_connection(db_path)
     try:
+        # Check if legacy seed data exists and purge to refresh with canonical tickets
+        try:
+            legacy_check = conn.cursor().execute(
+                "SELECT COUNT(*) FROM escalation_decisions WHERE ticket_id = 'SUP-11204' AND agent_id = 'Rahul T'"
+            ).fetchone()[0]
+            if legacy_check > 0:
+                conn.cursor().execute("DELETE FROM escalation_decisions")
+                conn.commit()
+        except Exception:
+            pass
+
         count = conn.cursor().execute("SELECT COUNT(*) FROM escalation_decisions").fetchone()[0]
         if count > 0:
             return
     finally:
         conn.close()
 
+    # Grounded in actual records from tickets_clean.csv
     samples = [
-        ("SUP-11204", "Rahul T", "Report export failing", "P2", "Mid-market", 0.92,
-         "Gate Activated: L1 Troubleshooting Required", "Escalated to Tier 3 Eng", 1,
-         "Client escalated via Account Manager; insisted on engineering ticket.", "2026-09-24T10:15:00", "Duplicate of known issue"),
-        ("SUP-11218", "Karan B", "Live tracking / GPS incorrect", "P1", "Enterprise", 0.88,
-         "Gate Activated: L1 Troubleshooting Required", "Escalated to Tier 3 Eng", 1,
-         "Driver app GPS stream dropped for VIP airport convoy.", "2026-09-25T08:30:00", "Config issue - returned to L1"),
-        ("SUP-11225", "Sneha M", "Login / access issue", "P3", "SMB", 0.94,
+        ("SUP-11204", "Karan B", "Live tracking / GPS incorrect", "P4", "Enterprise", 0.86,
          "Gate Activated: L1 Troubleshooting Required", "Resolved at L1", 0,
-         "", "2026-09-25T11:45:00", "Clean Close"),
-        ("SUP-11240", "Rahul T", "Roster / booking not syncing", "P2", "Enterprise", 0.86,
+         "", "2026-09-18T15:41:00", "Clean Close"),
+        ("SUP-11218", "Ananya R", "Report export failing", "P3", "Mid-market", 0.92,
          "Gate Activated: L1 Troubleshooting Required", "Escalated to Tier 3 Eng", 1,
-         "Bulk shift roster failing 500 error on upload.", "2026-09-26T14:20:00", "Fixed"),
-        ("SUP-11252", "Vikram S", "OTP / boarding issue", "P1", "Enterprise", 0.35,
+         "Client insisted on immediate engineering ticket for board pack.", "2026-09-19T11:20:00", "Insufficient info - returned to L1"),
+        ("SUP-11225", "Neha P", "OTP / boarding issue", "P4", "Enterprise", 0.90,
+         "Gate Activated: L1 Troubleshooting Required", "Resolved at L1", 0,
+         "", "2026-09-19T14:15:00", "Clean Close"),
+        ("SUP-11240", "Neha P", "Driver / vehicle compliance docs", "P4", "Enterprise", 0.91,
+         "Gate Activated: L1 Troubleshooting Required", "Resolved at L1", 0,
+         "", "2026-09-20T09:30:00", "Clean Close"),
+        ("SUP-11252", "Karan B", "Login / access issue", "P2", "Mid-market", 0.92,
+         "Gate Activated: L1 Troubleshooting Required", "Resolved at L1", 0,
+         "", "2026-09-21T10:45:00", "Clean Close"),
+        ("SUP-11267", "Priya D", "OTP / boarding issue", "P2", "Enterprise", 0.84,
+         "Gate Activated: L1 Troubleshooting Required", "Escalated to Tier 3 Eng", 1,
+         "Shift supervisor reported multiple drivers unable to generate OTP at hub.", "2026-09-21T16:10:00", "Fixed"),
+        ("SUP-11280", "Sneha M", "Login / access issue", "P4", "SMB", 0.93,
+         "Gate Activated: L1 Troubleshooting Required", "Resolved at L1", 0,
+         "", "2026-09-22T11:00:00", "Clean Close"),
+        ("SUP-11295", "Karan B", "Roster / booking not syncing", "P4", "Mid-market", 0.81,
+         "Gate Passed: Engineering Escalation Approved", "Resolved at L1", 0,
+         "", "2026-09-23T13:20:00", "Clean Close"),
+        ("SUP-11308", "Neha P", "Billing / invoice discrepancy", "P4", "Enterprise", 0.94,
+         "Gate Activated: L1 Troubleshooting Required", "Resolved at L1", 0,
+         "", "2026-09-24T09:15:00", "Clean Close"),
+        ("SUP-11322", "Vikram S", "Roster / booking not syncing", "P3", "Enterprise", 0.68,
+         "Gate Passed: Engineering Escalation Approved", "Resolved at L1", 0,
+         "", "2026-09-24T15:40:00", "Clean Close"),
+        ("SUP-11335", "Arjun K", "Report export failing", "P4", "Mid-market", 0.91,
+         "Gate Activated: L1 Troubleshooting Required", "Escalated to Tier 3 Eng", 1,
+         "Admin reported 504 gateway timeout on monthly export.", "2026-09-25T10:30:00", "Config issue - returned to L1"),
+        ("SUP-11350", "Vikram S", "Roster / booking not syncing", "P4", "Enterprise", 0.58,
          "Gate Passed: Engineering Escalation Approved", "Escalated to Tier 3 Eng", 0,
-         "", "2026-09-26T18:10:00", "Fixed"),
-        ("SUP-11267", "Ananya R", "Billing / invoice discrepancy", "P2", "Mid-market", 0.91,
-         "Gate Activated: L1 Troubleshooting Required", "Resolved at L1", 0,
-         "", "2026-09-27T09:40:00", "Clean Close"),
-        ("SUP-11280", "Arjun K", "Driver / vehicle compliance docs", "P3", "SMB", 0.95,
-         "Gate Activated: L1 Troubleshooting Required", "Resolved at L1", 0,
-         "", "2026-09-27T16:00:00", "Clean Close"),
-        ("SUP-11295", "Karan B", "Report export failing", "P2", "Enterprise", 0.89,
-         "Gate Activated: L1 Troubleshooting Required", "Escalated to Tier 3 Eng", 1,
-         "CFO dashboard export required for quarterly board pack.", "2026-09-28T11:05:00", "Duplicate of known issue"),
-        ("SUP-11308", "Neha P", "Cab delay / no-show complaint", "P2", "Mid-market", 0.93,
-         "Gate Activated: L1 Troubleshooting Required", "Resolved at L1", 0,
-         "", "2026-09-28T15:25:00", "Clean Close"),
-        ("SUP-11322", "Priya D", "How-to / feature request", "P4", "SMB", 0.97,
-         "Gate Activated: L1 Troubleshooting Required", "Resolved at L1", 0,
-         "", "2026-09-29T10:50:00", "Clean Close"),
-        ("SUP-11335", "Rahul T", "Live tracking / GPS incorrect", "P2", "Enterprise", 0.87,
-         "Gate Activated: L1 Troubleshooting Required", "Escalated to Tier 3 Eng", 1,
-         "Client ops room unable to view 14 vehicles simultaneously.", "2026-09-29T13:40:00", "Insufficient info - returned to L1"),
-        ("SUP-11350", "Sneha M", "Employee address / geocode change", "P3", "Enterprise", 0.96,
-         "Gate Activated: L1 Troubleshooting Required", "Resolved at L1", 0,
-         "", "2026-09-30T09:15:00", "Clean Close")
+         "", "2026-09-26T14:00:00", "Fixed")
     ]
 
     for item in samples:

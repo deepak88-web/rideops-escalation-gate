@@ -84,6 +84,10 @@ class TestOverrideLogger(unittest.TestCase):
         seed_sample_overrides_if_empty(self.db_path)
         df = get_logged_decisions(db_path=self.db_path)
         self.assertGreaterEqual(len(df), 10)
+        rec_11204 = df[df["ticket_id"] == "SUP-11204"]
+        self.assertEqual(len(rec_11204), 1)
+        self.assertEqual(rec_11204.iloc[0]["agent_id"], "Karan B")
+        self.assertEqual(rec_11204.iloc[0]["category"], "Live tracking / GPS incorrect")
 
 
 if __name__ == "__main__":
