@@ -1,9 +1,12 @@
 # RideOps Escalation Gate
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://rideops-escalation-gate-9jhw3dinn2dvcn6megkmic.streamlit.app/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Pipeline](https://img.shields.io/badge/pipeline-passing-brightgreen.svg)](run_pipeline.py)
 [![Status](https://img.shields.io/badge/status-production--ready-success.svg)]()
 
+> 🚀 **Live Cloud Deployment**: [https://rideops-escalation-gate-9jhw3dinn2dvcn6megkmic.streamlit.app/](https://rideops-escalation-gate-9jhw3dinn2dvcn6megkmic.streamlit.app/)
+>
 > **Predictive Escalation Gate, Operational Intelligence & Triage Analytics for RideOps Support Tickets**
 
 ---
@@ -103,7 +106,10 @@ pip install -r requirements.txt
 ## 4. Execution & Automated Pipeline
 
 ### 1. Launch the Interactive v0 Tool (Streamlit App)
-To interact with the live Decision Support Gate and Operations Cockpit:
+
+> 🌐 **Live Cloud App**: Access the hosted deployment directly at **[rideops-escalation-gate.streamlit.app](https://rideops-escalation-gate-9jhw3dinn2dvcn6megkmic.streamlit.app/)**.
+
+To interact with the live Decision Support Gate and Operations Cockpit locally:
 
 ```bash
 streamlit run app.py
