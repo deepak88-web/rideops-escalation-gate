@@ -92,6 +92,18 @@ def compute_first_response_sla(
     return d3_sla
 
 
+def assign_age_band(hrs: float) -> str:
+    """Classify ticket age into operational prioritisation bands (Section 3)."""
+    if pd.isna(hrs) or hrs < 24.0:
+        return "Under 24 hours"
+    elif hrs <= 48.0:
+        return "24–48 hours"
+    elif hrs <= 72.0:
+        return "48–72 hours"
+    else:
+        return "More than 72 hours"
+
+
 def compute_open_backlog_age_bands(df: pd.DataFrame) -> pd.DataFrame:
     """
     Compute open backlog age bands (>24h, >48h, >7d) as of snapshot date (D4).
@@ -109,3 +121,19 @@ def compute_open_backlog_age_bands(df: pd.DataFrame) -> pd.DataFrame:
     })
     d4_age["pct_of_open"] = d4_age["open_tickets"] / max(total_open, 1) * 100
     return d4_age
+
+
+def compute_ticket_ageing_prioritization(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Compute ticket ageing distribution across 4 operational priority bands (Section 3).
+    """
+    open_df = df[df["is_open"] == 1].copy()
+    total_open = len(open_df)
+    open_df["age_band"] = open_df["open_age_hrs"].apply(assign_age_band)
+    bands = ["Under 24 hours", "24–48 hours", "48–72 hours", "More than 72 hours"]
+    counts = open_df["age_band"].value_counts().reindex(bands, fill_value=0)
+    return pd.DataFrame({
+        "age_band": bands,
+        "open_tickets": counts.values,
+        "pct_of_open": (counts.values / max(total_open, 1) * 100).round(2)
+    })

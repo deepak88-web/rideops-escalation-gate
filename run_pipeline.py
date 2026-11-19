@@ -57,7 +57,9 @@ from src.models import (
     run_cross_validation,
     run_temporal_validation,
     train_and_save_champion,
+    train_and_validate_live_gate,
 )
+from src.logging import seed_sample_overrides_if_empty
 from src.visualization.plots import (
     plot_volume_and_backlog,
     plot_speed_and_escalations,
@@ -175,9 +177,19 @@ def main():
     )
     time_df.to_csv(TABLES_DIR / "j2_temporal_split_comparison.csv")
 
-    # Save Champion Model
+    # Save Champion Model 1
     champion_name = train_and_save_champion(fitted_models, time_df, save_path=MODEL_PATH)
-    print(f"Champion Model '{champion_name}' saved to {MODEL_PATH}")
+    print(f"Champion Model 1 '{champion_name}' saved to {MODEL_PATH}")
+
+    # 7. Model 2: Live Escalation Triage Gate (Pre-Escalation Decision Support)
+    print("\n[Step 7/7] Training & Evaluating Live Triage Gate Model (Model 2)...")
+    live_df, live_champ = train_and_validate_live_gate(df)
+    print("Live Triage Gate Temporal Validation Results (Sep Holdout):")
+    print(live_df[["ROC_AUC", "PR_AUC", "Precision", "Recall", "F1"]])
+
+    # Initialize and seed override logging database
+    seed_sample_overrides_if_empty()
+    print("Initialized persistent SQLite decision & override tracking database.")
 
     # Visualizations
     print("\nGenerating figures...")

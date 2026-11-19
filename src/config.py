@@ -36,6 +36,9 @@ PROCESSED_DATA_PATH = PROJECT_ROOT / _cfg.get("paths", {}).get("processed_ticket
 
 MODELS_DIR = PROJECT_ROOT / _cfg.get("paths", {}).get("models_dir", "models")
 MODEL_PATH = MODELS_DIR / "avoidable_escalation_gate.joblib"
+HISTORICAL_MODEL_PATH = MODEL_PATH
+LIVE_MODEL_PATH = PROJECT_ROOT / _cfg.get("paths", {}).get("live_model", "models/live_triage_gate.joblib")
+OVERRIDE_DB_PATH = PROJECT_ROOT / _cfg.get("paths", {}).get("override_db", "data/overrides.db")
 REPORTS_DIR = PROJECT_ROOT / _cfg.get("paths", {}).get("reports_dir", "reports")
 FIGURES_DIR = PROJECT_ROOT / _cfg.get("paths", {}).get("figures_dir", "reports/figures")
 TABLES_DIR = PROJECT_ROOT / _cfg.get("paths", {}).get("tables_dir", "reports/tables")
@@ -67,9 +70,36 @@ SLA_TARGETS_HOURS = _cfg.get("business_rules", {}).get("sla_targets_hours", {
     "P4": 24.0
 })
 
+# Canonical Taxonomies
+CANONICAL_CATEGORIES: List[str] = _cfg.get("taxonomy", {}).get("categories", [
+    "Billing / invoice discrepancy",
+    "Cab delay / no-show complaint",
+    "Driver / vehicle compliance docs",
+    "Employee address / geocode change",
+    "How-to / feature request",
+    "Live tracking / GPS incorrect",
+    "Login / access issue",
+    "OTP / boarding issue",
+    "Report export failing",
+    "Roster / booking not syncing"
+])
+CANONICAL_CHANNELS: List[str] = _cfg.get("taxonomy", {}).get("channels", [
+    "Client portal", "Email", "Phone", "WhatsApp"
+])
+CANONICAL_CLIENT_TIERS: List[str] = _cfg.get("taxonomy", {}).get("client_tiers", [
+    "Enterprise", "Mid-market", "SMB"
+])
+CANONICAL_AGENTS: List[str] = _cfg.get("taxonomy", {}).get("agents", [
+    "Ananya R", "Arjun K", "Karan B", "Neha P", "Priya D", "Rahul T", "Sneha M", "Vikram S"
+])
+CANONICAL_PRIORITIES: List[str] = _cfg.get("taxonomy", {}).get("priorities", [
+    "P1", "P2", "P3", "P4"
+])
+
 # Modeling Settings
 OPERATING_THRESHOLD = float(_cfg.get("modeling", {}).get("operating_threshold", 0.55))
 DEFAULT_MODEL_THRESHOLD = OPERATING_THRESHOLD
+LIVE_OPERATING_THRESHOLD = float(_cfg.get("modeling", {}).get("live_operating_threshold", 0.82))
 CV_FOLDS = int(_cfg.get("modeling", {}).get("cv_folds", 5))
 RANDOM_STATE = int(_cfg.get("modeling", {}).get("random_state", 42))
 TEMPORAL_SPLIT_MONTH = int(_cfg.get("modeling", {}).get("temporal_split_month", 9))

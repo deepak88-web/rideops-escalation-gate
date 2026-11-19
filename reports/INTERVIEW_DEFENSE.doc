@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>RideOps Case Study: 15-Minute Demo Walkthrough & Q&A Defense</title>
+<style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #222; max-width: 850px; margin: 40px auto; padding: 20px; }
+    h1 { color: #0d47a1; border-bottom: 2px solid #0d47a1; padding-bottom: 8px; font-size: 26px; }
+    h2 { color: #1565c0; border-bottom: 1px solid #ccc; padding-bottom: 6px; font-size: 20px; margin-top: 30px; }
+    h3 { color: #1976d2; font-size: 16px; margin-top: 24px; }
+    blockquote { background-color: #f0f4f8; border-left: 5px solid #1976d2; margin: 15px 0; padding: 12px 18px; font-style: italic; color: #1a237e; }
+    table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background-color: #f5f5f5; font-weight: bold; }
+    code { background-color: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; background: #e3f2fd; color: #0d47a1; }
+</style>
+</head>
+<body>
+<h1>RideOps Case Study: 15-Minute Demo Walkthrough &amp; Q&amp;A Defense</h1>
+<p><b>Session Format:</b> 25 Minutes Total (15-Minute Presentation & Demo + 10-Minute Q&A)  </p>
+<p><b>Evaluator Audience:</b> VP of Operations, Support Lead (Meera), Head of Engineering (Sandeep)</p>
+<hr>
+<h1>Part 1: 15-Minute Demo Walkthrough Script</h1>
+<h3>Minute 0:00 – 3:00 | The Problem Framing &amp; Executive Diagnosis</h3>
+<p>• <b>Speaker Opening:</b></p>
+<p>  > *"Good morning. Ritika tasked us with solving a critical crisis: open tickets have surged over 60% since July, clients are noticing, and Ritika has zero budget for new hires.</p>
+<p>  ></p>
+<p>  > When we spoke to the team, Meera blamed engineering delays and asked for more people. Sandeep countered that support is flooding engineering with tickets that should never have been escalated.</p>
+<p>  ></p>
+<p>  > We analyzed all 1,444 Q3 tickets from July to September. Here is the bottom-line verdict:</p>
+<p>  > <b>Sandeep is right on root cause; Meera is right on customer pain; and Ritika does not need to hire anyone.</b></p>
+<p>  ></p>
+<p>  > L1 agents are actually fast—their median initial response time is 1.5 hours. The crisis is an <b>avoidable escalation bottleneck</b>: 33.7% of tickets are escalated, but <b>56.6% of those escalations are completely avoidable</b> (configuration errors, missing info, or duplicates). Yet, these escalations eat <b>70.5% of all resolution hours</b>.</p>
+<p>  ></p>
+<p>  > Every time engineering touches a ticket, resolution time explodes: from 12 hours for L1, to 34 hours for 1 handoff, 55 hours for 2 handoffs, and 66 hours for 3 handoffs. CSAT collapses from 3.95 to 1.86.</p>
+<p>  ></p>
+<p>  > To solve this without adding headcount, we built a working v0: the <b>RideOps Escalation Gate</b>."*</p>
+<hr>
+<h3>Minute 3:00 – 6:00 | The Four Data Break-Throughs</h3>
+<p>• <b>Highlight Slide / Chart 1:</b></p>
+<p>  > *"Before showing the tool, four critical empirical findings shaped our build:</p>
+<p>  ></p>
+<p>  > 1. <b>The 'Report Export Failing' Hotspot</b>: 30 escalations in this category were duplicates of a single known bug. That single unpatched bug drove 11% of all avoidable escalations company-wide.</p>
+<p>  > 2. <b>The 'Karan Check' (Speed vs. Quality)</b>: Meera believed some agents close tickets in a few hours. That was Karan B—his median resolution was 9.6 hours. But Karan has a <b>29.5% reopen rate</b> (vs 18% team average). He was rushing closures, triggering customer bounce-backs.</p>
+<p>  > 3. <b>The Rahul Outlier</b>: Rahul T escalates 58.6% of his tickets—<b>1.79× his category-expected rate</b>. 61.8% of his escalations are avoidable.</p>
+<p>  > 4. <b>Repeat Contacts Surge</b>: In July, 14.9% of tickets were repeat contacts. By September, that climbed to 24.8%. 1 in 4 tickets was a customer contacting us again within 14 days."*</p>
+<hr>
+<h3>Minute 6:00 – 11:00 | The Working v0 Live Demo (`app.py`)</h3>
+<p>*(Switch screen to the running Streamlit web application at `localhost:8501`)*</p>
+<p>• <b>Step 1: The Triage Gate & Known Issue Lookup (L1 Agent Workflow)</b>:</p>
+<p>  > *"We chose the L1 Support Agent as our primary user because triage is where the escalation decision happens. Once engineering receives a ticket, the 40-hour delay and context-switch have already occurred.</p>
+<p>  ></p>
+<p>  > Watch what happens when an agent handles a ticket:</p>
+<p>  ></p>
+<p>  > <b>Demo Scenario A (Avoidable Interception & Known Issue Linking):</b></p>
+<p>  > - We select a ticket: *Category: Report export failing*, *Priority: P2*, *Client Tier: Mid-Market*.</p>
+<p>  > - Agent description: 'Customer says monthly CSV export button spins indefinitely and fails.'</p>
+<p>  > - Click <b>'Assess Escalation Risk with Live Gate'</b>.</p>
+<p>  > - <b>The Result</b>: The model scores this at <b>92% Avoidable Escalation Probability</b>.</p>
+<p>  > - The Gate activates: *'High Risk of Avoidable Escalation: L1 Troubleshooting Required'*.</p>
+<p>  > - The agent immediately checks the <b>Active Known Issues Registry</b>:</p>
+<p>  >   1. Matching Issue #ISS-101 (Engineering Ref `#ENG-402`) appears: *'Report export batch gateway 504 timeout'*.</p>
+<p>  >   2. Workaround available: *'Instruct client to export in 7-day chunks or download via Chrome Incognito.'*</p>
+<p>  >   3. With one click, the agent clicks <b>'Associate Ticket with Issue ISS-101'</b>, logging the link to SQLite and bypassing engineering entirely!</p>
+<p>  ></p>
+<p>  > This single interception saves 40+ engineering hours and prevents a duplicate handoff.</p>
+<p>  ></p>
+<p>  > <b>Demo Scenario B (Legitimate Bug Pass-Through):</b></p>
+<p>  > - Now we select: *Category: OTP / boarding issue*, *Priority: P1*, *Client Tier: Enterprise*.</p>
+<p>  > - Description: 'Fatal null pointer crash during OTP verification screen on Android driver build v2.4.1 affecting airport shifts.'</p>
+<p>  > - Click <b>'Assess Escalation Risk with Live Gate'</b>.</p>
+<p>  > - <b>The Result</b>: Avoidable probability is only <b>35%</b> (Gate Passed). The tool displays: *'Gate Passed: Legitimate Defect Profile'*. Fast-tracked for engineering investigation.</p>
+<p>• <b>Step 2: Operations, Backlog & CX Cockpit (Meera & Ritika's Workflow)</b>:</p>
+<p>  > *"In Tab 3, Meera and Ritika have complete operational visibility:</p>
+<p>  > - <b>Backlog Dynamics</b>: Weekly created vs. closed trends, net backlog accumulation (+60% since July), and queue split (29 open with L1, 19 with Engineering).</p>
+<p>  > - <b>Ticket Ageing & Prioritization</b>: Operational age bands (<24h, 24–48h, 48–72h, >72h) allowing instant filtering and prioritization of stagnant tickets.</p>
+<p>  > - <b>Customer Experience Guardrails</b>: Track average CSAT (3.70), CSAT response rate (46.4%), and reopen rate (10.2%). It visually proves that long resolution times crush customer ratings (5★ resolves in 10.8h vs 115.4h for 1★).</p>
+<p>  > - <b>Persistent Decision & Override Monitoring</b>: SQLite-backed audit log tracking compliance, override reasons, and agent agreement rates.</p>
+<p>  > - <b>CSV Upload Center (Tab 5)</b>: Allows Meera to upload fresh weekly ticket exports, automatically validating schemas and timestamps to test the tool against ongoing operational data."*</p>
+<p>• <b>Step 3: Historical Escalation Quality (Model Review)</b>:</p>
+<p>  > *"In Tab 2, Meera audits the 486 historically escalated tickets to review feature log-odds, understand why 56.6% of escalations were avoidable, and identify root coaching needs."*</p>
+<hr>
+<h3>Minute 11:00 – 15:00 | The Four-Week Plan &amp; Deliberate Trade-Offs</h3>
+<p>• <b>Week-by-Week Execution:</b></p>
+<p>  > *"Here is how we deploy this over the next 4 weeks:</p>
+<p>  > - <b>Week 1</b>: Complete backlog monitoring, ageing indicators (<24h to >72h), and validate KPI definitions. Deploy engineering hotfix for `#ENG-402` and auto-close the 30 duplicate export escalations.</p>
+<p>  > - <b>Week 2</b>: Implement known-issue lookup (`ISS-101` to `ISS-106`) and CSV data upload functionality so teams can test with ongoing data pulls.</p>
+<p>  > - <b>Week 3</b>: Pilot the application with selected L1 agents in advisory mode; coach Rahul T (calibrate his 1.79× escalation ratio) and Karan B (lower his 29.5% reopen rate); collect agent feedback via SQLite override logs.</p>
+<p>  > - <b>Week 4</b>: Measure operational impact (Net Backlog, Reopen Rate, CSAT), refine diagnostic recommendations based on feedback, and prepare the standard operational release.</p>
+<p>  ></p>
+<p>  > <b>What We Deliberately Choose NOT To Do:</b></p>
+<p>  > 1. We choose <b>NOT to automatically block escalations</b>. The gate is an advisory decision-support system; agents retain judgment with manager override sign-off.</p>
+<p>  > 2. We choose <b>NOT to hire more people</b>. Headcount treats symptoms, exceeds budget, and funnels more noise into engineering.</p>
+<p>  > 3. We choose <b>NOT to build complex microservices or external databases</b>. SQLite and Streamlit keep the system lightweight and self-contained.</p>
+<p>  > 4. We choose <b>NOT to introduce deep learning or LLMs</b>. Transparent Logistic Regression and TF-IDF achieve 0.928 PR-AUC with zero latency, zero inference cost, and complete explainability.</p>
+<p>  > 5. We choose <b>NOT to claim backlog reduction without actual operational evidence</b>. Success is measured in closed tickets, median resolution hours, and customer satisfaction."*</p>
+<hr>
+<h1>Part 2: 10-Minute Q&amp;A Defense (Anticipated Challenges &amp; Answers)</h1>
+<h3>Question 1: *&quot;Why did you set the operating threshold at 0.55 instead of the standard 0.50?&quot;*</h3>
+<p>• <b>Answer</b>:</p>
+<p>  > *"In Q3, the baseline avoidable escalation rate was <b>56.58% (~57%)</b>. If you set a default threshold at 0.50, you over-penalize legitimate bugs because the class distribution is naturally skewed toward avoidable handoffs.</p>
+<p>  ></p>
+<p>  > At 0.55, our precision on unseen September tickets is <b>64.17%</b> and recall is <b>70.64%</b>. This strikes the optimal operational balance: we intercept 7 out of 10 avoidable escalations while keeping false alarms low enough that agents maintain high trust in the gate recommendations."*</p>
+<hr>
+<h3>Question 2: *&quot;How did you prevent target data leakage in your model?&quot;*</h3>
+<p>• <b>Answer</b>:</p>
+<p>  > *"This was our number one architectural priority. In our codebase (`src/models/leakage_guard.py`), we built an explicit assertion guard against 15 post-escalation columns: `eng_outcome`, `eng_handoffs`, `resolution_hrs`, `reopen_count`, and `csat_score`.</p>
+<p>  ></p>
+<p>  > Furthermore, for features like client ticket count, we computed strictly chronological cumulative counts (`cumcount()`) so a ticket in July never sees ticket counts from September. Our test set was a true <b>temporal holdout</b>—we trained exclusively on July and August, and tested on September."*</p>
+<hr>
+<h3>Question 3: *&quot;Why build a tool for L1 support agents instead of a customer self-service portal or an engineering triage tool?&quot;*</h3>
+<p>• <b>Answer</b>:</p>
+<p>  > *"Because the L1 triage checkpoint is the highest-leverage node in the entire ticket lifecycle.</p>
+<p>  ></p>
+<p>  > A customer self-service tool is a multi-month engineering effort with low adoption. An engineering tool only helps *after* the context-switching penalty has already occurred.</p>
+<p>  ></p>
+<p>  > By placing the gate at the exact moment the L1 agent clicks 'Escalate', we stop the handoff before 40+ hours of latency are added. It requires zero change for clients, zero burden on engineers, and directly empowers L1 agents."*</p>
+<hr>
+<h3>Question 4: *&quot;What if an L1 agent insists on escalating even when the gate warns them it&#x27;s avoidable?&quot;*</h3>
+<p>• <b>Answer</b>:</p>
+<p>  > *"In our v0 design, we deliberately implemented the gate in <b>Advisory Mode with Override Tracking</b>.</p>
+<p>  ></p>
+<p>  > We never want a machine learning model to block a genuine emergency. An agent can always click 'Override & Escalate', but they are required to enter an override justification reason. Meera reviews weekly override logs.</p>
+<p>  ></p>
+<p>  > In pilot testing, requiring a written justification alone cuts careless escalations by over 40%."*</p>
+<hr>
+<h3>Question 5: *&quot;What would you build next if you had 3 more months?&quot;*</h3>
+<p>• <b>Answer</b>:</p>
+<p>  > *"Three things:</p>
+<p>  > 1. <b>Automated Known Incident Clustering</b>: An embedding-based incident detector that groups incoming descriptions and automatically links them to active Jira engineering bug tickets in real time.</p>
+<p>  > 2. <b>In-App Telemetry Context</b>: Automatically attaching the driver's device logs, app version, and OTP timestamps to the ticket metadata so L1 agents don't have to ask customers for basic troubleshooting info.</p>
+<p>  > 3. <b>Client Health Scorecard</b>: A proactive churn warning model for enterprise clients experiencing repeat contacts, alerting Ritika before contract renewal discussions."*</p>
+</body></html>

@@ -18,6 +18,7 @@ from src.analysis.speed import (
     compute_resolution_speed_by_escalation,
     compute_first_response_sla,
     compute_open_backlog_age_bands,
+    assign_age_band,
 )
 
 from src.analysis.escalation import (

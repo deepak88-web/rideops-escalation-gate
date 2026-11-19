@@ -5,6 +5,9 @@ paths:
   data_dictionary: "data/raw/rideops_data_dictionary.csv"
   processed_tickets: "data/processed/tickets_clean.csv"
   models_dir: "models"
+  champion_model: "models/champion_gate.joblib"
+  live_model: "models/live_triage_gate.joblib"
+  override_db: "data/overrides.db"
   reports_dir: "reports"
   figures_dir: "reports/figures"
   tables_dir: "reports/tables"
@@ -39,8 +42,45 @@ business_rules:
     day_2: 48
     day_7: 168
 
+taxonomy:
+  categories:
+    - "Billing / invoice discrepancy"
+    - "Cab delay / no-show complaint"
+    - "Driver / vehicle compliance docs"
+    - "Employee address / geocode change"
+    - "How-to / feature request"
+    - "Live tracking / GPS incorrect"
+    - "Login / access issue"
+    - "OTP / boarding issue"
+    - "Report export failing"
+    - "Roster / booking not syncing"
+  channels:
+    - "Client portal"
+    - "Email"
+    - "Phone"
+    - "WhatsApp"
+  client_tiers:
+    - "Enterprise"
+    - "Mid-market"
+    - "SMB"
+  agents:
+    - "Ananya R"
+    - "Arjun K"
+    - "Karan B"
+    - "Neha P"
+    - "Priya D"
+    - "Rahul T"
+    - "Sneha M"
+    - "Vikram S"
+  priorities:
+    - "P1"
+    - "P2"
+    - "P3"
+    - "P4"
+
 modeling:
   operating_threshold: 0.55
+  live_operating_threshold: 0.82
   cv_folds: 5
   random_state: 42
   temporal_split_month: 9  # Train on Jul-Aug (months 7, 8), Test on Sep (month 9)

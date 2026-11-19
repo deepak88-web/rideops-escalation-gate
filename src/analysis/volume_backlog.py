@@ -15,10 +15,16 @@ def compute_weekly_volume_and_backlog(
     Compute weekly created, closed, net backlog, and end-of-week open tickets.
     """
     df_calc = df.copy()
+    if "created_at" in df_calc.columns:
+        df_calc["created_at"] = pd.to_datetime(df_calc["created_at"])
+    if "final_closed_at" in df_calc.columns:
+        df_calc["final_closed_at"] = pd.to_datetime(df_calc["final_closed_at"])
+
     if "week_start" not in df_calc.columns and "created_at" in df_calc.columns:
-        created = pd.to_datetime(df_calc["created_at"])
-        df_calc["week_start"] = created.dt.to_period("W-SUN").apply(lambda r: r.start_time)
+        df_calc["week_start"] = df_calc["created_at"].dt.to_period("W-SUN").apply(lambda r: r.start_time)
         df_calc["is_partial_week"] = df_calc["week_start"].isin(PARTIAL_WEEKS).astype(int)
+    else:
+        df_calc["week_start"] = pd.to_datetime(df_calc["week_start"])
 
     weeks = sorted(df_calc["week_start"].unique())
     weekly_rows = []

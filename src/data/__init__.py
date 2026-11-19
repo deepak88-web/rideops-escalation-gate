@@ -11,6 +11,15 @@ from .quality import (
     flag_partial_weeks,
     run_data_quality_audit,
 )
+from .known_issues import (
+    load_known_issues,
+    search_known_issues,
+    get_known_issue_by_id,
+)
+from .upload_validator import (
+    REQUIRED_COLUMNS,
+    validate_uploaded_tickets_csv,
+)
 
 __all__ = [
     "load_raw_tickets",
@@ -20,4 +29,9 @@ __all__ = [
     "validate_escalation_consistency",
     "flag_partial_weeks",
     "run_data_quality_audit",
+    "load_known_issues",
+    "search_known_issues",
+    "get_known_issue_by_id",
+    "REQUIRED_COLUMNS",
+    "validate_uploaded_tickets_csv",
 ]

@@ -32,6 +32,13 @@ from src.models.train import (
     train_and_save_champion,
 )
 
+from src.models.live_gate import (
+    build_live_triage_labels,
+    prepare_live_model_dataset,
+    get_live_model_pipelines,
+    train_and_validate_live_gate,
+)
+
 __all__ = [
     "CAT_FEATURES",
     "NUM_FEATURES",
@@ -50,4 +57,8 @@ __all__ = [
     "run_cross_validation",
     "run_temporal_validation",
     "train_and_save_champion",
+    "build_live_triage_labels",
+    "prepare_live_model_dataset",
+    "get_live_model_pipelines",
+    "train_and_validate_live_gate",
 ]
