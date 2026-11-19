@@ -48,6 +48,8 @@ reports/tables/*
 *.swp
 *.swo
 *.db
+*INTERVIEW_DEFENSE*
+
 
 
 # OS specific

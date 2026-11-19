@@ -53,7 +53,6 @@ rideops-escalation-gate/
 │   │   └── j_model_calibration_and_features.png
 │   ├── tables/                         # 20+ exported analysis tables (CSV)
 │   ├── SUBMISSION_WRITEUP.md           # Official 4-part case study submission write-up
-│   ├── INTERVIEW_DEFENSE.md            # 15-minute demo script & 10-minute Q&A defense
 │   └── EXECUTIVE_SUMMARY.md            # Comprehensive executive decision brief
 ├── src/                                # Production Python source package
 │   ├── data/                           # Ingestion & data quality suite (Section A)
