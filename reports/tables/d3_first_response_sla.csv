@@ -1,0 +1,5 @@
+priority,sla_target_hrs,responded_tickets,within_sla_count,sla_attainment_pct
+P1,1.0,67,65.0,97.01492537313433
+P2,4.0,264,245.0,92.8030303030303
+P3,8.0,740,637.0,86.08108108108108
+P4,24.0,368,340.0,92.3913043478261

@@ -36,10 +36,6 @@ data/interim/*
 *.pkl
 *.onnx
 
-# Reports output
-reports/figures/*
-reports/tables/*
-
 # Environments & IDEs
 .env
 .env.*

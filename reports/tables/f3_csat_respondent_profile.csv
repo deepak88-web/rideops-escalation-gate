@@ -1,0 +1,15 @@
+dimension,segment_value,tickets,responded,response_rate_pct
+channel,Client portal,377,168,44.56233421750663
+channel,Email,553,248,44.846292947558766
+channel,Phone,292,136,46.57534246575342
+channel,WhatsApp,222,96,43.24324324324324
+client_tier,Enterprise,614,276,44.951140065146575
+client_tier,Mid-market,656,295,44.96951219512195
+client_tier,SMB,174,77,44.252873563218394
+is_escalated,0,958,428,44.676409185803756
+is_escalated,1,486,220,45.267489711934154
+is_reopened,0,1293,588,45.47563805104408
+is_reopened,1,151,60,39.735099337748345
+status,Closed,1396,648,46.41833810888252
+status,Open - with Engineering,19,0,0.0
+status,Open - with L1,29,0,0.0

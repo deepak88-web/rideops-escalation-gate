@@ -1,0 +1,11 @@
+category,tickets,escalated,esc_rate_pct,avoidable_esc,avoidable_rate_pct
+Live tracking / GPS incorrect,228,127,55.70175438596491,67,52.75590551181102
+Roster / booking not syncing,344,175,50.872093023255815,97,55.42857142857143
+Report export failing,206,77,37.37864077669903,51,66.23376623376623
+OTP / boarding issue,95,34,35.78947368421053,21,61.76470588235294
+Billing / invoice discrepancy,88,26,29.545454545454547,13,50.0
+Employee address / geocode change,75,11,14.666666666666666,6,54.54545454545454
+How-to / feature request,104,12,11.538461538461538,9,75.0
+Cab delay / no-show complaint,147,14,9.523809523809524,5,35.714285714285715
+Login / access issue,100,8,8.0,5,62.5
+Driver / vehicle compliance docs,57,2,3.508771929824561,1,50.0

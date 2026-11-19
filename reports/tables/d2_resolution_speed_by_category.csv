@@ -1,0 +1,11 @@
+category,n,median_hrs,p90_hrs
+Roster / booking not syncing,327.0,44.483333333333334,139.21666666666667
+Live tracking / GPS incorrect,215.0,42.733333333333334,182.70000000000002
+Billing / invoice discrepancy,85.0,39.61666666666667,121.26666666666681
+Report export failing,201.0,23.866666666666667,102.2
+Driver / vehicle compliance docs,55.0,20.3,54.623333333333335
+OTP / boarding issue,92.0,18.5,114.17
+Employee address / geocode change,73.0,17.933333333333334,64.68333333333332
+Cab delay / no-show complaint,145.0,10.75,39.37333333333331
+How-to / feature request,104.0,8.975,49.31333333333337
+Login / access issue,99.0,7.616666666666666,24.956666666666674

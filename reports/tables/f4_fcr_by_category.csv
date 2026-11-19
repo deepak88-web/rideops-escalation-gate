@@ -1,0 +1,11 @@
+category,tickets,fcr_tickets,fcr_rate_pct
+Login / access issue,100,90,90.0
+Driver / vehicle compliance docs,57,50,87.71929824561403
+How-to / feature request,104,90,86.53846153846155
+Cab delay / no-show complaint,147,124,84.35374149659864
+Employee address / geocode change,75,55,73.33333333333333
+Billing / invoice discrepancy,88,56,63.63636363636363
+OTP / boarding issue,95,55,57.89473684210527
+Report export failing,206,115,55.8252427184466
+Roster / booking not syncing,344,134,38.95348837209303
+Live tracking / GPS incorrect,228,83,36.40350877192983

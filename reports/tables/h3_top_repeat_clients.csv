@@ -1,0 +1,21 @@
+client_id,client_name,client_tier,total_tickets,repeat_tickets,repeat_rate_pct
+CL-010,Meridian Labs,Enterprise,37,19,51.35135135135135
+CL-175,Orion Health,Enterprise,25,12,48.0
+CL-088,Evergreen Systems,Enterprise,24,11,45.83333333333333
+CL-114,Bluestone Financial,Enterprise,26,11,42.30769230769231
+CL-153,Orion Financial,Enterprise,26,11,42.30769230769231
+CL-098,Horizon Infotech,Enterprise,25,10,40.0
+CL-060,Summit Financial,Enterprise,26,10,38.46153846153847
+CL-113,Horizon Labs,Enterprise,22,9,40.909090909090914
+CL-034,Silverline Analytics,Enterprise,27,9,33.33333333333333
+CL-081,Harbor Tech Park,Enterprise,24,8,33.33333333333333
+CL-100,Meridian Tech Park,Mid-market,17,7,41.17647058823529
+CL-067,Nimbus Systems,Enterprise,20,7,35.0
+CL-070,Orion Systems,Enterprise,12,6,50.0
+CL-123,Cobalt Infotech,Enterprise,17,6,35.294117647058826
+CL-138,Horizon Consulting,Mid-market,18,6,33.33333333333333
+CL-189,Apex Financial,Enterprise,22,6,27.27272727272727
+CL-163,Crescent Solutions,Enterprise,24,6,25.0
+CL-032,Cobalt Tech Park,Mid-market,14,5,35.714285714285715
+CL-101,Vertex Health,Enterprise,18,5,27.77777777777778
+CL-050,Sterling Global Services,Enterprise,19,5,26.31578947368421

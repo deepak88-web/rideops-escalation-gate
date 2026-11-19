@@ -1,0 +1,9 @@
+hypothesis,test,statistic,p_value,significant_0.05,p_value_fmt
+Avoidable escalation rate differs by category,Chi-Square (dof=9),chi2 = 8.908,0.445792477572477,False,0.4458
+Reopen rate differs by assigned agent,Chi-Square (dof=7),chi2 = 102.078,4.013224508972749e-19,True,4.0132e-19
+Resolution time differs: Escalated (86.8h) vs Non-Esc (12.6h),Mann-Whitney U,"U = 404,483.5",5.750579046666174e-162,True,5.7506e-162
+Resolution time differs: Avoidable (103.1h) vs Fixed (64.8h),Mann-Whitney U,"U = 35,114.5",5.576215459085698e-13,True,5.5762e-13
+"CSAT differs across engineering handoff counts (0, 1, 2, 3)",Kruskal-Wallis H,H = 165.587,1.1411458315048931e-35,True,1.1411e-35
+CSAT correlates negatively with handoff count,Spearman Rank Corr,rho = -0.472,2.7588957142806143e-37,True,2.7589e-37
+Weekly ticket volume trends upward (+5.42 tkts/wk),Linear Trend (OLS),r = 0.861,0.0003269607935929115,True,3.2696e-04
+Weekly median resolution time stays flat (+0.34 hrs/wk),Linear Trend (OLS),r = 0.183,0.5702089277700825,False,0.5702

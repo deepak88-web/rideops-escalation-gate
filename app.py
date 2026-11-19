@@ -465,7 +465,11 @@ elif view_mode == "🔍 Historical Escalation Quality":
         )
 
     st.subheader("Key Drivers of Avoidable Escalations (Logistic Regression Coefficients)")
-    st.image(str(FIGURES_DIR / "j_model_calibration_and_features.png"))
+    fig_calib_path = FIGURES_DIR / "j_model_calibration_and_features.png"
+    if fig_calib_path.exists():
+        st.image(str(fig_calib_path), use_container_width=True)
+    else:
+        st.info("ℹ️ Calibration & feature importance chart will be generated when pipeline executes.")
 
     st.info(
         "💡 **Key Insights from Historical Escalation Analysis:**\n\n"
@@ -647,7 +651,11 @@ elif view_mode == "🧑‍💻 Agent Quality & The Karan Check":
         )
 
     st.subheader("Visualizing the Speed vs. Reopen Trade-Off (The Karan Check)")
-    st.image(str(FIGURES_DIR / "fg_agent_benchmarking.png"))
+    fig_bench_path = FIGURES_DIR / "fg_agent_benchmarking.png"
+    if fig_bench_path.exists():
+        st.image(str(fig_bench_path), use_container_width=True)
+    else:
+        st.info("ℹ️ Agent benchmarking chart will be generated when pipeline executes.")
 
     col_k1, col_k2 = st.columns(2)
     with col_k1:
